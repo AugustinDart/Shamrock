@@ -41,9 +41,11 @@ def plot_orbits(m1, m2, a, e, roll, pitch, yaw):
     x1, x2, y1, y2, z1, z2 = [], [], [], [], [], []
 
     vx1, vx2, vy1, vy2, vz1, vz2 = [], [], [], [], [], []
-
+    n_periods = 1
     max_nu = np.pi
     min_nu = -np.pi
+
+
     if e >= 1:  # if parabolic do not exceed pi
         max_nu = 0.75 * np.pi
         min_nu = -0.75 * np.pi
@@ -90,20 +92,6 @@ def plot_orbits(m1, m2, a, e, roll, pitch, yaw):
 
 # %%
 # Orbit 1
-plot_orbits(0.7, 0.3, 1.0, 0.3, 0.0, 0.0, 0.0)
+plot_orbits(0.7, 0.3, 1.0, 0.3, 0.0, 0.0, 0.0)     # (m1,m2 (masse solaire),a (UA),e (excentricité),roll,pitch,yaw)
 
-# %%
-# Orbit 2
-plot_orbits(0.5, 0.5, 1.0, 0.3, 1.0, 0.0, 0.0)
-
-# %%
-# Orbit 3
-plot_orbits(0.5, 0.5, 1.0, 0.0, 1.0, 0.0, 0.0)
-
-# %%
-# Orbit 4
-plot_orbits(0.9, 0.1, 1.0, 0.0, 0.0, 1.0, 0.0)
-
-# %%
-# Orbit 5 (hyperbolic)
-plot_orbits(0.9, 0.1, 1.0, 1.2, 0.0, 1.0, 0.0)
+#e=1-f*2
