@@ -415,7 +415,7 @@ Tscal c = 1000;
 Tscal epsilon_grav_sink = 1e-9;
 
 // Choix entre gravitation newtonienne et post-newtonienne
-bool is_pn = true; // true pour PN, false pour Newtonienne
+bool is_pn = false; // true pour PN, false pour Newtonienne
 
 if (!is_pn) {
 
@@ -423,7 +423,7 @@ if (!is_pn) {
         Tvec sum{};
         
         for (Sink &s2 : sink_parts) {
-            Tscal M = s1.mass + s2.mass;
+            
             if (&s1 == &s2)
                 continue;
 
