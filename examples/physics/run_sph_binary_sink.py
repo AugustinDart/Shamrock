@@ -31,8 +31,8 @@ G = ucte.G()
 
 # %%
 # Simulation parameters
-T = 100  # number of years
-dt = 0.01  # time step in code units
+T = 100 # number of years
+dt = 0.001  # time step in code units
 n_steps = int(T / dt)  # number of steps to evolve
 
 # %%
@@ -286,7 +286,7 @@ if __name__ == "__main__":
     m1 = 1
     m2 = 0.000006
     a = 1.0
-    e = 0.0
+    e = 0.7
 
     # racc=0.001 AU is much smaller than binary separation (~0.7 AU at periapsis)
     ctx, model = build_binary_sph_model(m1, m2, a, e, roll=0.0, pitch=0.0, yaw=0.0, racc=0.001)

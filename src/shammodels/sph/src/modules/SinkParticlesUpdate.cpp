@@ -399,18 +399,81 @@ void shammodels::sph::modules::SinkParticlesUpdate<Tvec, SPHKernel>::compute_ext
         s.ext_acceleration = Tvec{};
     }
 
-    Tscal G                 = solver_config.get_constant_G();
-    Tscal epsilon_grav_sink = 1e-9;
+Tscal G = solver_config.get_constant_G();
+Tscal c = 63241.1;
+Tscal epsilon_grav_sink = 1e-9;
+
+// Choix entre gravitation newtonienne et post-newtonienne
+bool is_pn = true; // true pour PN, false pour Newtonienne
+
+if (!is_pn) {
 
     for (Sink &s1 : sink_parts) {
         Tvec sum{};
+        
         for (Sink &s2 : sink_parts) {
-            Tvec rij       = s1.pos - s2.pos;
+            
+            if (&s1 == &s2)
+                continue;
+
+            Tvec rij = s1.pos - s2.pos;
             Tscal rij_scal = sycl::length(rij);
-            sum -= G * s2.mass * rij / (rij_scal * rij_scal * rij_scal + epsilon_grav_sink);
+
+            sum -= G * s2.mass* rij
+                   / (rij_scal * rij_scal * rij_scal + epsilon_grav_sink);
         }
-        s1.ext_acceleration = sum;
+
+        s1.ext_acceleration += sum;
     }
+
+} else {
+    std::cout << "On est bien en 1PN" << std::endl;
+    
+    for (Sink &s1 : sink_parts) {
+        
+        Tvec sum{};
+
+        for (Sink &s2 : sink_parts) {
+
+            Tscal M = s1.mass + s2.mass;
+            Tscal nu = s1.mass * s2.mass / M;
+            Tscal eta = nu / M;
+
+            if (&s1 == &s2)
+                continue;
+
+            Tvec term0{};
+            Tvec term1{};
+
+            Tvec rij = s1.pos - s2.pos;
+            Tscal rij_scal = sycl::length(rij);
+
+            Tvec nij = rij / rij_scal;
+            Tvec vij = s1.velocity - s2.velocity;
+
+            Tscal vij_nij = sycl::dot(vij, nij);
+            Tscal v2 = sycl::dot(vij, vij);
+
+            
+
+            term0 = -G * s2.mass * rij
+                    / (rij_scal * rij_scal * rij_scal + epsilon_grav_sink);
+
+            term1 =
+                -G *  s2.mass / (rij_scal * rij_scal + epsilon_grav_sink)
+                * (
+                    ((1 + 3 * eta) * v2 * nij) 
+                    - 2 * (2 + eta) * G * M / ((rij_scal + epsilon_grav_sink) ) * nij
+                    - 1.5 * eta * vij_nij * vij_nij* nij
+                    - 2 * (2 - eta) * vij_nij * vij
+                  );
+
+            sum += term0 + 1/(c*c)*term1;
+        }
+
+        s1.ext_acceleration += sum;
+    }
+}
 }
 
 using namespace shammath;
